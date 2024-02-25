@@ -148,21 +148,27 @@ class SubgraphDataset(Dataset):
                 r_labels_neg.append(r_label_neg)
                 g_labels_neg.append(g_label_neg)
         
-        print("Nodes of subgraph: ", len(subgraph_pos.nodes()))
+        # print("Nodes of subgraph: ", len(subgraph_pos.nodes()))
         return subgraph_pos, g_label_pos, r_label_pos, subgraphs_neg, g_labels_neg, r_labels_neg, 
 
     def __len__(self):
         return self.num_graphs_pos
 
     def _prepare_subgraphs(self, nodes, r_label, n_labels):
-        subgraph = dgl.DGLGraph(self.graph.subgraph(nodes))
-        subgraph.edata['type'] = self.graph.edata['type'][self.graph.subgraph(nodes).parent_eid]
+        subgraph: dgl.DGLGraph = self.graph.subgraph(nodes)
+        subgraph.edata['type'] = self.graph.edata['type'][subgraph.edata[dgl.EID]]
         subgraph.edata['label'] = torch.tensor(r_label * np.ones(subgraph.edata['type'].shape), dtype=torch.long)
         
-        edges_btw_roots = subgraph.edge_id(0, 1)
-        rel_link = np.nonzero(subgraph.edata['type'][edges_btw_roots] == r_label)
-        if rel_link.squeeze().nelement() == 0:
-            subgraph.add_edge(0, 1)
+        # Check if the target relation is in the subgraph
+        has_rel = subgraph.has_edges_between(0, 1)
+        if has_rel:
+            edges_btw_roots = subgraph.edge_ids(0, 1)
+            # rel_link = np.nonzero(subgraph.edata['type'][edges_btw_roots] == r_label)   
+            rel_link = subgraph.edata['type'][edges_btw_roots].item() == r_label # If the target relation is not in the subgraph, add a self-loop to the subgraph
+        # if rel_link.squeeze().nelement() == 0:
+        if not has_rel or not rel_link : # If there is no relation between the roots, or the target relation is not in the subgraph (these two cases may only occur for neg sample, because for neg sample, the target relation may not really exist, so we have to add this edge manually)
+            # subgraph.add_edge(0, 1)
+            subgraph.add_edges([0], [1])
             subgraph.edata['type'][-1] = torch.tensor(r_label).type(torch.LongTensor)
             subgraph.edata['label'][-1] = torch.tensor(r_label).type(torch.LongTensor)
 
@@ -172,7 +178,7 @@ class SubgraphDataset(Dataset):
         subgraph = self._prepare_features_new(subgraph, n_labels, r_label, n_feats)
 
         # Add the original node id feature
-        subgraph.ndata['parent_id'] = self.graph.subgraph(nodes).parent_nid
+        subgraph.ndata['parent_id'] = self.graph.subgraph(nodes).ndata[dgl.NID]
         # Add the neighbor relations 
         subgraph.ndata['out_nei_rels'] = torch.LongTensor(self.m_h2r[subgraph.ndata['parent_id']])
         subgraph.ndata['in_nei_rels'] = torch.LongTensor(self.m_t2r[subgraph.ndata['parent_id']])

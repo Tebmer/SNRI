@@ -177,7 +177,7 @@ class GraphClassifier(nn.Module):
         g.ndata['h'], r_emb_out = self.gnn(g, r)
         
         # GRU layer for nodes
-        graph_sizes = g.batch_num_nodes
+        graph_sizes = g.batch_num_nodes()
         out_dim = self.params.num_gcn_layers * self.params.emb_dim
         g.ndata['repr'] = F.relu(self.batch_gru(g.ndata['repr'].view(-1, out_dim), graph_sizes))
         node_hiddens = F.relu(self.W_o(g.ndata['repr']))  # num_nodes x hidden 

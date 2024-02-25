@@ -92,7 +92,7 @@ def process_files(files, saved_relation2id=None, add_traspose_rels=False, sort_d
     # rels_len = triplets['train'].shape(0) // num_ents
     h_nei_rels_len = int(np.percentile(list(h2r_len.values()), 75))
     t_nei_rels_len = int(np.percentile(list(t2r_len.values()), 75))
-    logging.info("Average number of relations each node: ", "head: ", h_nei_rels_len, 'tail: ', t_nei_rels_len)
+    logging.info(f"Average number of relations each node: head: {h_nei_rels_len}, tail: {t_nei_rels_len}")
     
     # The index "num_rels" of relation is considered as "padding" relation.
     # Use padding relation to initialize matrix of ent2rels.

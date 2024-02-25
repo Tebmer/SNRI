@@ -52,7 +52,7 @@ class Trainer():
         model_params = list(self.graph_classifier.parameters())
         
         for b_idx, batch in enumerate(dataloader):
-            print("batch:", b_idx)
+            # print("batch:", b_idx)
             
             # Input positive and negative graph 
             data_pos, targets_pos, data_neg, targets_neg, data_cor = self.params.move_batch_to_device(batch, self.params.device)
@@ -61,8 +61,9 @@ class Trainer():
             score_pos, s_G_pos, s_g_pos = self.graph_classifier(data_pos, is_return_emb=True)
             score_neg = self.graph_classifier(data_neg)
 
-            loss = self.criterion(score_pos, score_neg.view(len(score_pos), -1).mean(dim=1), torch.Tensor([1]).to(device=self.params.device))
-            print(f"loss: {loss}")
+            # loss = self.criterion(score_pos, score_neg.view(len(score_pos), -1).mean(dim=1), torch.Tensor([1]).to(device=self.params.device))
+            loss = self.criterion(score_pos.squeeze(-1), score_neg.view(len(score_pos), -1).mean(dim=1), torch.Tensor([1]).to(device=self.params.device))
+            # print(f"loss: {loss}")
 
             dgi_loss = 0
             if self.params.coef_dgi_loss:

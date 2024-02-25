@@ -7,12 +7,12 @@ Code for paper [Subgraph Neighboring Relations Infomax for Inductive Link Predic
 Inductive link prediction for knowledge graph aims at predicting missing links between unseen entities, those not shown in training stage. Most previous works learn entity-specific embeddings of entities, which cannot handle unseen entities. Recent several methods utilize enclosing subgraph to obtain inductive ability. However, all these works only consider the enclosing part of subgraph without complete neighboring relations, which leads to the issue that partial neighboring relations are neglected, and sparse subgraphs are hard to be handled. To address that, we propose Subgraph Neighboring Relations Infomax, SNRI, which sufficiently exploits complete neighboring relations from two aspects: \textit{neighboring relational feature} for node feature and \textit{neighboring relational path} for sparse subgraph. To further model neighboring relations in a global way, we innovatively apply mutual information (MI) maximization for knowledge graph. Experiments show that SNRI outperforms existing state-of-art methods by a large margin on inductive link prediction task, and verify the effectiveness of exploring complete neighboring relations in a global way to characterize node features and reason on sparse subgraphs. 
 
 ## Requirements
-    dgl==0.4.2
-    lmdb==0.98
-    networkx==2.4
-    scikit-learn==0.22.1
-    torch==1.4.0
-    tqdm==4.43.0
+    dgl
+    lmdb
+    networkx
+    scikit-learn
+    torch
+    tqdm
 
 ## Usage
 

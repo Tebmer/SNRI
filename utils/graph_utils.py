@@ -74,8 +74,7 @@ def ssp_multigraph_to_dgl(graph, n_feats=None):
         g_nx.add_edges_from(nx_triplets)
 
     # make dgl graph
-    g_dgl = dgl.DGLGraph(multigraph=True)
-    g_dgl.from_networkx(g_nx, edge_attrs=['type'])
+    g_dgl = dgl.from_networkx(g_nx, edge_attrs=['type'])
     # add node features
     if n_feats is not None:
         g_dgl.ndata['feat'] = torch.tensor(n_feats)
@@ -154,15 +153,17 @@ def move_batch_to_device_dgl_train(batch, device):
     return ((g_dgl_pos, r_labels_pos), targets_pos, (g_dgl_neg, r_labels_neg), targets_neg, (g_dgl_cor, r_labels_pos))
 
 def send_graph_to_device(g, device):
-    # nodes
-    labels = g.node_attr_schemes()
-    for l in labels.keys():
-        g.ndata[l] = g.ndata.pop(l).to(device)
+    # # nodes
+    # labels = g.node_attr_schemes()
+    # for l in labels.keys():
+    #     g.ndata[l] = g.ndata.pop(l).to(device)
 
-    # edges
-    labels = g.edge_attr_schemes()
-    for l in labels.keys():
-        g.edata[l] = g.edata.pop(l).to(device)
+    # # edges
+    # labels = g.edge_attr_schemes()
+    # for l in labels.keys():
+    #     g.edata[l] = g.edata.pop(l).to(device)
+    # return g
+    g = g.to(device)
     return g
 
 #  The following three functions are modified from networks source codes to
